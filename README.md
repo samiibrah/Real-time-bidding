@@ -2,7 +2,7 @@
 
 A DSP-side bidding simulation environment built to demonstrate core adtech concepts: auction mechanics, pCVR-based bid pricing, budget pacing, bid shading, and censored bid landscape estimation.
 
-This is not a toy — each component reflects how real DSP bidding stacks are designed, with explicit attention to the statistical problems that make RTB interesting.
+Each component reflects how real DSP bidding stacks are designed, with explicit attention to the statistical problems that make RTB interesting.
 
 ---
 
