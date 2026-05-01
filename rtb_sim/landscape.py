@@ -60,7 +60,7 @@ class BidLandscapeEstimator:
 
     def _maybe_fit(self):
         n = len(self._win_prices) + len(self._loss_bids)
-        if n >= self.min_obs and n % 25 == 0:
+        if n >= self.min_obs and n % 250 == 0:
             self._fit()
 
     def _fit(self):
@@ -120,23 +120,27 @@ class BidLandscapeEstimator:
 
     def expected_clearing_price(self, bid: float) -> float:
         """
-        Expected clearing price in second-price auction given we win.
-        E[max_competitor | max_competitor < bid]
-        = E[X | X < bid] under fitted log-normal.
+        Expected clearing price in a second-price auction conditional on winning.
+
+        E[X | X < bid] for X ~ LogNormal(mu, sigma). This uses the closed-form
+        left-truncated log-normal mean, which is much faster than numerical
+        integration and allows the bidder to call this during live optimization.
         """
         if not self._fitted:
             return bid * 0.85
-        # Truncated mean of log-normal below bid
-        from scipy.stats import lognorm as ln
-        dist = ln(s=self._sigma, scale=np.exp(self._mu))
-        cdf_at_bid = dist.cdf(bid)
-        if cdf_at_bid < 1e-6:
+        if bid <= 0:
+            return 0.0
+
+        from scipy.special import ndtr
+
+        mu, sigma = self._mu, self._sigma
+        z = (np.log(bid + 1e-12) - mu) / sigma
+        cdf_at_bid = ndtr(z)
+        if cdf_at_bid < 1e-9:
             return bid * 0.5
-        # Numerical integration via percentiles
-        p_upper = cdf_at_bid
-        quantiles = np.linspace(0.01, 0.99, 200)
-        values = dist.ppf(quantiles * p_upper)
-        return float(np.mean(values[values < bid]))
+
+        numerator = np.exp(mu + 0.5 * sigma**2) * ndtr(z - sigma)
+        return float(numerator / cdf_at_bid)
 
     def optimal_bid_second_price(self, true_value: float) -> float:
         """
