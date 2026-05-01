@@ -22,7 +22,7 @@ This is not a toy — each component reflects how real DSP bidding stacks are de
 ## Installation
 
 ```bash
-git clone https://github.com/your-username/rtb-sim.git
+git clone https://github.com/samiibrah/real-time-bidding.git
 cd rtb-sim
 pip install -e .
 ```
