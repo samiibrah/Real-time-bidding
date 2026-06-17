@@ -41,9 +41,17 @@ This simulator answers: *How much does principled inference under censoring impr
 ## Installation
 
 ```bash
-git clone https://github.com/samiibrah/real-time-bidding.git
-cd rtb-sim
+git clone https://github.com/samiibrah/Real-time-bidding.git
+cd Real-time-bidding
+
+python -m venv .venv
+source .venv/bin/activate
+
 pip install -e .
+
+Run tests:
+
+pytest tests/ -v
 ```
 
 ---
@@ -60,8 +68,8 @@ df = run_simulation(
     daily_budget=5_000.0,
     seed=42,
 )
+print( df[ [ "won", "clearing_price", "converted", "estimated_pcvr", "true_pcvr", ] ].head(10) )
 
-print(df[["won", "clearing_price", "converted", "estimated_pcvr", "true_pcvr"]].head(10))
 ```
 ## Strategies Compared (50,000 impressions)
 
